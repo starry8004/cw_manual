@@ -22,15 +22,8 @@ const ShortcutHandler = {
    * 초기화
    */
   init() {
-    // background에서 오는 단축키 메시지 리스너
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-      if (request.type === 'shortcut') {
-        this.handleShortcut(request.command);
-        sendResponse({ success: true });
-      }
-      return true;
-    });
-
+    // 키보드 이벤트 리스너 등록
+    this.setupKeyboardListener();
     console.log('단축키 핸들러 초기화 완료');
   },
 
@@ -234,8 +227,8 @@ const ShortcutHandler = {
   },
 
   /**
-   * 키보드 이벤트 리스너 등록 (폴백)
-   * Chrome Extensions의 commands API가 작동하지 않을 때 사용
+   * 키보드 이벤트 리스너 등록
+   * Alt+알파벳 조합으로 모든 단축키 처리
    */
   setupKeyboardListener() {
     document.addEventListener('keydown', (e) => {
@@ -273,6 +266,6 @@ const ShortcutHandler = {
       }
     });
 
-    console.log('키보드 리스너 등록 완료 (폴백)');
+    console.log('키보드 리스너 등록 완료');
   }
 };

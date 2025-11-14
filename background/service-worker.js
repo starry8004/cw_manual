@@ -11,27 +11,6 @@ chrome.action.onClicked.addListener(() => {
   });
 });
 
-// 단축키 명령 처리
-chrome.commands.onCommand.addListener((command) => {
-  // 현재 활성화된 도우미 창에 메시지 전송
-  chrome.runtime.sendMessage({
-    type: 'shortcut',
-    command: command
-  }).catch(() => {
-    // 창이 열려있지 않으면 무시
-    console.log('Helper window not open');
-  });
-});
-
-// 메시지 리스너 (단축키 처리용)
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === 'copy-to-clipboard') {
-    // 클립보드 복사는 콘텐츠 스크립트나 팝업에서 직접 처리
-    sendResponse({ success: true });
-  }
-  return true;
-});
-
 // 설치 시 환영 메시지
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {

@@ -22,7 +22,6 @@ class CoupangWingHelper {
 
     // 단축키 핸들러 초기화
     ShortcutHandler.init();
-    ShortcutHandler.setupKeyboardListener();
 
     // 단축키 콜백 등록
     this.setupShortcutCallbacks();
