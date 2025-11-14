@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build artifacts
+dist/
+build/
+
+# Package files (if using npm)
+package-lock.json
+yarn.lock
+
+# User data (example/test files)
+test-data/
+sample-data/
+
+# Generated icons (should be created by user)
+icons/*.png
+
+# Environment files
+.env
+.env.local

@@ -1,0 +1,96 @@
+{
+  "manifest_version": 3,
+  "name": "쿠팡 윙 상품등록 도우미",
+  "version": "1.0.0",
+  "description": "Alt+알파벳 단축키로 CSV 데이터를 쿠팡 윙에 빠르게 등록",
+  "permissions": [
+    "storage",
+    "clipboardWrite"
+  ],
+  "action": {
+    "default_title": "쿠팡 상품등록 도우미 열기",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "commands": {
+    "copy-brand": {
+      "suggested_key": { "default": "Alt+B" },
+      "description": "브랜드 복사 (Brand)"
+    },
+    "copy-title": {
+      "suggested_key": { "default": "Alt+T" },
+      "description": "상품명 복사 (Title)"
+    },
+    "copy-price": {
+      "suggested_key": { "default": "Alt+P" },
+      "description": "판매가 복사 (Price)"
+    },
+    "copy-category": {
+      "suggested_key": { "default": "Alt+C" },
+      "description": "카테고리 복사 (Category)"
+    },
+    "copy-option": {
+      "suggested_key": { "default": "Alt+O" },
+      "description": "옵션정보 복사 (Option)"
+    },
+    "copy-volume": {
+      "suggested_key": { "default": "Alt+V" },
+      "description": "용량 복사 (Volume)"
+    },
+    "copy-ingredient": {
+      "suggested_key": { "default": "Alt+I" },
+      "description": "전성분 복사 (Ingredient)"
+    },
+    "copy-discount": {
+      "suggested_key": { "default": "Alt+D" },
+      "description": "할인전금액 복사 (Discount)"
+    },
+    "copy-shipping": {
+      "suggested_key": { "default": "Alt+S" },
+      "description": "배송비 복사 (Shipping)"
+    },
+    "copy-url": {
+      "suggested_key": { "default": "Alt+U" },
+      "description": "상품URL 복사 (URL)"
+    },
+    "copy-main-image": {
+      "suggested_key": { "default": "Alt+M" },
+      "description": "대표 이미지 경로 복사 (Main)"
+    },
+    "copy-additional-images": {
+      "suggested_key": { "default": "Alt+A" },
+      "description": "추가 이미지 경로 복사 (Additional)"
+    },
+    "open-folder": {
+      "suggested_key": { "default": "Alt+F" },
+      "description": "이미지 폴더 열기 (Folder)"
+    },
+    "next-product": {
+      "suggested_key": { "default": "Alt+N" },
+      "description": "다음 상품 (Next)"
+    },
+    "previous-product": {
+      "suggested_key": { "default": "Alt+E" },
+      "description": "이전 상품 (prEvious)"
+    },
+    "mark-failed": {
+      "suggested_key": { "default": "Alt+X" },
+      "description": "실패 처리 (Failed - X)"
+    },
+    "view-all": {
+      "suggested_key": { "default": "Alt+W" },
+      "description": "전체 데이터 보기 (vieW)"
+    }
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>쿠팡 윙 상품등록 도우미</title>
+  <link rel="stylesheet" href="../styles/variables.css">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../styles/components.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 초기 설정 화면 -->
+    <div id="setup-screen" class="screen">
+      <div class="container">
+        <div class="header">
+          <h1>🚀 쿠팡 상품등록 도우미 - 초기 설정</h1>
+        </div>
+
+        <div class="setup-content">
+          <!-- Step 1: CSV 파일 선택 -->
+          <section class="setup-section">
+            <h2>1️⃣ CSV 파일 선택</h2>
+            <div class="file-selector">
+              <div id="csv-file-info" class="file-info">
+                <div class="file-placeholder">📄 CSV 파일을 선택하세요</div>
+              </div>
+              <div class="button-group">
+                <button id="select-csv-btn" class="btn btn-primary">파일 선택...</button>
+                <button id="recent-csv-btn" class="btn btn-secondary">최근 파일 ▼</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Step 2: 이미지 폴더 선택 -->
+          <section class="setup-section">
+            <h2>2️⃣ 이미지 폴더 선택</h2>
+            <div class="folder-selector">
+              <div id="image-folder-info" class="file-info">
+                <div class="file-placeholder">📁 이미지 폴더를 선택하세요</div>
+              </div>
+              <button id="select-folder-btn" class="btn btn-primary">폴더 선택...</button>
+            </div>
+          </section>
+
+          <!-- Step 3: 내부관리번호 생성 -->
+          <section class="setup-section">
+            <h2>3️⃣ 내부관리번호 생성</h2>
+            <div class="id-generator">
+              <div class="form-group">
+                <label for="brand-code">브랜드코드 (2자리):</label>
+                <input type="text" id="brand-code" maxlength="2" value="CP" placeholder="CP">
+              </div>
+              <div class="form-group">
+                <label for="date-code">수집일자 (MMDD):</label>
+                <input type="text" id="date-code" maxlength="4" placeholder="1104">
+              </div>
+              <div class="form-group">
+                <label for="start-number">시작 연번:</label>
+                <input type="text" id="start-number" maxlength="3" value="001" placeholder="001">
+              </div>
+
+              <div class="preview-box">
+                <div class="preview-label">미리보기:</div>
+                <div id="id-preview" class="preview-value">CP1104_001</div>
+                <div class="preview-info">
+                  <div id="total-count">📊 총 상품 수: -</div>
+                  <div id="id-range">생성 범위: -</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 작업 내용 요약 -->
+          <section class="setup-section">
+            <h2>✅ 작업 내용</h2>
+            <div class="task-list">
+              <div class="task-item">☑️ CSV에 '신규내부관리번호' 컬럼 추가</div>
+              <div class="task-item">☑️ '내부관리번호' → '올리브영상품번호'로 변경</div>
+              <div class="task-item">☑️ '상태' 컬럼 추가 (기본값: 대기)</div>
+              <div class="task-item">☑️ 이미지 폴더 리네임</div>
+            </div>
+            <div class="warning-box">
+              <div class="warning-icon">⚠️</div>
+              <div class="warning-content">
+                <div class="warning-title">원본 파일은 자동 백업됩니다</div>
+                <div id="backup-location" class="warning-text">백업 위치: 변환 시 표시됩니다</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 버튼 -->
+          <div class="action-buttons">
+            <button id="preview-btn" class="btn btn-secondary" disabled>미리보기</button>
+            <button id="convert-btn" class="btn btn-primary" disabled>변환 시작</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 변환 진행 화면 -->
+    <div id="converting-screen" class="screen hidden">
+      <div class="container">
+        <div class="header">
+          <h1>🔄 CSV 변환 중...</h1>
+        </div>
+
+        <div class="progress-content">
+          <section class="progress-section">
+            <h3>📋 CSV 처리</h3>
+            <div class="progress-bar">
+              <div id="csv-progress" class="progress-fill"></div>
+            </div>
+            <div id="csv-status" class="progress-status">대기 중...</div>
+          </section>
+
+          <section class="progress-section">
+            <h3>🖼️ 이미지 폴더 리네임</h3>
+            <div class="progress-bar">
+              <div id="image-progress" class="progress-fill"></div>
+            </div>
+            <div id="image-status" class="progress-status">대기 중...</div>
+            <div id="image-log" class="progress-log"></div>
+          </section>
+
+          <div class="action-buttons">
+            <button id="cancel-convert-btn" class="btn btn-danger">중단</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 변환 완료 화면 -->
+    <div id="complete-screen" class="screen hidden">
+      <div class="container">
+        <div class="header">
+          <h1>✅ 변환 완료!</h1>
+        </div>
+
+        <div class="complete-content">
+          <section class="result-section">
+            <h2>📊 변환 결과</h2>
+            <div class="result-box">
+              <div id="result-summary"></div>
+              <div id="result-warnings" class="warnings"></div>
+            </div>
+          </section>
+
+          <section class="backup-section">
+            <h3>💾 백업 위치</h3>
+            <div id="backup-path" class="path-display"></div>
+          </section>
+
+          <section class="file-section">
+            <h3>📁 변환된 파일</h3>
+            <div id="converted-file" class="path-display"></div>
+          </section>
+
+          <div class="action-buttons">
+            <button id="open-folder-btn" class="btn btn-secondary">폴더 열기</button>
+            <button id="start-helper-btn" class="btn btn-primary">도우미 시작</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 메인 화면 (상품 등록) -->
+    <div id="main-screen" class="screen hidden">
+      <div class="container main-container">
+        <!-- 헤더 -->
+        <div class="main-header">
+          <h1>쿠팡 상품등록 도우미</h1>
+          <div class="header-actions">
+            <button id="settings-btn" class="icon-btn" title="설정">⚙️</button>
+            <button id="help-btn" class="icon-btn" title="도움말">?</button>
+          </div>
+        </div>
+
+        <!-- CSV 파일 정보 -->
+        <div class="file-header">
+          <div class="file-name">📄 <span id="current-csv-name">-</span></div>
+          <button id="change-file-btn" class="btn btn-small">파일 변경</button>
+        </div>
+
+        <!-- 현재 상품 정보 -->
+        <div class="product-section">
+          <div class="product-header">
+            <h2>📦 현재 상품: <span id="current-index">-</span>/<span id="total-products">-</span></h2>
+            <span id="product-status" class="status-badge">대기 중</span>
+          </div>
+
+          <div class="product-card">
+            <div class="product-id-row">
+              <div class="product-id">
+                <span class="label">🆔</span>
+                <span id="product-id" class="value">-</span>
+              </div>
+              <div class="original-id">
+                (원본: <span id="original-id">-</span>)
+              </div>
+            </div>
+
+            <div class="product-fields">
+              <div class="field-row" data-field="brand">
+                <div class="field-label">
+                  <span class="field-icon">🏷️</span>
+                  <span class="field-name">브랜드</span>
+                  <span class="shortcut-hint">[Alt+B]</span>
+                </div>
+                <div class="field-value" id="field-brand">-</div>
+                <button class="copy-btn" data-field="brand" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="title">
+                <div class="field-label">
+                  <span class="field-icon">📦</span>
+                  <span class="field-name">상품명</span>
+                  <span class="shortcut-hint">[Alt+T]</span>
+                </div>
+                <div class="field-value" id="field-title">-</div>
+                <button class="copy-btn" data-field="title" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="price">
+                <div class="field-label">
+                  <span class="field-icon">💰</span>
+                  <span class="field-name">판매가</span>
+                  <span class="shortcut-hint">[Alt+P]</span>
+                </div>
+                <div class="field-value" id="field-price">-</div>
+                <button class="copy-btn" data-field="price" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="category">
+                <div class="field-label">
+                  <span class="field-icon">📂</span>
+                  <span class="field-name">카테고리</span>
+                  <span class="shortcut-hint">[Alt+C]</span>
+                </div>
+                <div class="field-value" id="field-category">-</div>
+                <button class="copy-btn" data-field="category" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="option">
+                <div class="field-label">
+                  <span class="field-icon">⚙️</span>
+                  <span class="field-name">옵션정보</span>
+                  <span class="shortcut-hint">[Alt+O]</span>
+                </div>
+                <div class="field-value truncate" id="field-option">-</div>
+                <button class="copy-btn" data-field="option" title="복사">📋</button>
+              </div>
+            </div>
+
+            <button id="show-more-fields-btn" class="btn btn-text">더 많은 필드 보기 ▼</button>
+
+            <div id="additional-fields" class="product-fields hidden">
+              <div class="field-row" data-field="volume">
+                <div class="field-label">
+                  <span class="field-icon">📏</span>
+                  <span class="field-name">용량</span>
+                  <span class="shortcut-hint">[Alt+V]</span>
+                </div>
+                <div class="field-value" id="field-volume">-</div>
+                <button class="copy-btn" data-field="volume" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="ingredient">
+                <div class="field-label">
+                  <span class="field-icon">🧪</span>
+                  <span class="field-name">전성분</span>
+                  <span class="shortcut-hint">[Alt+I]</span>
+                </div>
+                <div class="field-value truncate" id="field-ingredient">-</div>
+                <button class="copy-btn" data-field="ingredient" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="discount">
+                <div class="field-label">
+                  <span class="field-icon">💵</span>
+                  <span class="field-name">할인전금액</span>
+                  <span class="shortcut-hint">[Alt+D]</span>
+                </div>
+                <div class="field-value" id="field-discount">-</div>
+                <button class="copy-btn" data-field="discount" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="shipping">
+                <div class="field-label">
+                  <span class="field-icon">🚚</span>
+                  <span class="field-name">배송비</span>
+                  <span class="shortcut-hint">[Alt+S]</span>
+                </div>
+                <div class="field-value" id="field-shipping">-</div>
+                <button class="copy-btn" data-field="shipping" title="복사">📋</button>
+              </div>
+
+              <div class="field-row" data-field="url">
+                <div class="field-label">
+                  <span class="field-icon">🔗</span>
+                  <span class="field-name">상품URL</span>
+                  <span class="shortcut-hint">[Alt+U]</span>
+                </div>
+                <div class="field-value truncate" id="field-url">-</div>
+                <button class="copy-btn" data-field="url" title="복사">📋</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 이미지 섹션 -->
+        <div class="image-section">
+          <h2>🖼️ 이미지 <span id="image-count">(0개)</span></h2>
+          <div class="image-card">
+            <div class="image-row">
+              <div class="image-label">
+                <span class="label-text">📸 대표</span>
+                <span class="shortcut-hint">[Alt+M]</span>
+              </div>
+              <div id="main-image-info" class="image-info">
+                <div class="image-placeholder">이미지 없음</div>
+              </div>
+              <button id="copy-main-image-btn" class="copy-btn" title="경로 복사">📋</button>
+            </div>
+
+            <div class="image-row">
+              <div class="image-label">
+                <span class="label-text">🖼️ 추가</span>
+                <span class="shortcut-hint">[Alt+A]</span>
+                <span id="additional-count" class="count-badge">0개</span>
+              </div>
+              <div id="additional-images-info" class="image-thumbnails">
+                <div class="image-placeholder">이미지 없음</div>
+              </div>
+              <button id="copy-additional-images-btn" class="copy-btn" title="모든 경로 복사">📋</button>
+            </div>
+
+            <div class="image-actions">
+              <button id="open-image-folder-btn" class="btn btn-secondary">
+                [Alt+F] 폴더 열기
+              </button>
+              <button id="preview-images-btn" class="btn btn-secondary">
+                이미지 미리보기
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 단축키 가이드 -->
+        <div class="shortcut-section">
+          <div class="shortcut-header">
+            <h2>⌨️ 빠른 단축키 (Alt+키)</h2>
+            <button id="toggle-shortcuts-btn" class="btn btn-text">전체보기 ▼</button>
+          </div>
+
+          <div class="shortcut-quick">
+            <div class="shortcut-grid">
+              <span class="shortcut-item"><kbd>B</kbd>:브랜드</span>
+              <span class="shortcut-item"><kbd>T</kbd>:상품명</span>
+              <span class="shortcut-item"><kbd>P</kbd>:가격</span>
+              <span class="shortcut-item"><kbd>C</kbd>:카테고리</span>
+              <span class="shortcut-item"><kbd>M</kbd>:대표이미지</span>
+              <span class="shortcut-item"><kbd>A</kbd>:추가이미지</span>
+              <span class="shortcut-item"><kbd>N</kbd>:다음</span>
+              <span class="shortcut-item"><kbd>X</kbd>:실패</span>
+            </div>
+          </div>
+
+          <div id="shortcut-full" class="shortcut-full hidden">
+            <div class="shortcut-category">
+              <h3>📋 상품 정보</h3>
+              <div class="shortcut-list">
+                <div class="shortcut-detail"><kbd>Alt+B</kbd> 브랜드 (Brand)</div>
+                <div class="shortcut-detail"><kbd>Alt+T</kbd> 상품명 (Title)</div>
+                <div class="shortcut-detail"><kbd>Alt+P</kbd> 판매가 (Price)</div>
+                <div class="shortcut-detail"><kbd>Alt+C</kbd> 카테고리 (Category)</div>
+                <div class="shortcut-detail"><kbd>Alt+O</kbd> 옵션정보 (Option)</div>
+                <div class="shortcut-detail"><kbd>Alt+V</kbd> 용량 (Volume)</div>
+                <div class="shortcut-detail"><kbd>Alt+I</kbd> 전성분 (Ingredient)</div>
+                <div class="shortcut-detail"><kbd>Alt+D</kbd> 할인전금액 (Discount)</div>
+                <div class="shortcut-detail"><kbd>Alt+S</kbd> 배송비 (Shipping)</div>
+                <div class="shortcut-detail"><kbd>Alt+U</kbd> 상품URL (URL)</div>
+              </div>
+            </div>
+
+            <div class="shortcut-category">
+              <h3>🖼️ 이미지</h3>
+              <div class="shortcut-list">
+                <div class="shortcut-detail"><kbd>Alt+M</kbd> 대표 이미지 (Main)</div>
+                <div class="shortcut-detail"><kbd>Alt+A</kbd> 추가 이미지 전체 (Additional)</div>
+                <div class="shortcut-detail"><kbd>Alt+F</kbd> 폴더 열기 (Folder)</div>
+              </div>
+            </div>
+
+            <div class="shortcut-category">
+              <h3>🔄 작업</h3>
+              <div class="shortcut-list">
+                <div class="shortcut-detail"><kbd>Alt+N</kbd> 다음 상품 (완료) - Next</div>
+                <div class="shortcut-detail"><kbd>Alt+E</kbd> 이전 상품 - prEvious</div>
+                <div class="shortcut-detail"><kbd>Alt+X</kbd> 실패 처리 - Failed (X)</div>
+                <div class="shortcut-detail"><kbd>Alt+W</kbd> 전체 데이터 보기 - vieW</div>
+              </div>
+            </div>
+
+            <div class="shortcut-tip">
+              <h4>💡 사용법</h4>
+              <ol>
+                <li>쿠팡 윙 입력 필드 클릭</li>
+                <li>Alt+키 (데이터 자동 복사)</li>
+                <li>Ctrl+V (붙여넣기)</li>
+                <li>반복...</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- 통계 -->
+        <div class="stats-section">
+          <h2>📊 통계</h2>
+          <div class="stats-card">
+            <div class="stats-row">
+              <div class="stat-item">
+                <span class="stat-icon">✅</span>
+                <span class="stat-label">완료:</span>
+                <span id="stat-completed" class="stat-value">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">⏳</span>
+                <span class="stat-label">대기:</span>
+                <span id="stat-pending" class="stat-value">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-icon">❌</span>
+                <span class="stat-label">실패:</span>
+                <span id="stat-failed" class="stat-value">0</span>
+              </div>
+            </div>
+            <div class="progress-bar">
+              <div id="overall-progress" class="progress-fill"></div>
+            </div>
+            <div class="progress-text">
+              진행률: <span id="progress-percent">0%</span> (<span id="progress-count">0/0</span>)
+            </div>
+          </div>
+        </div>
+
+        <!-- 네비게이션 버튼 -->
+        <div class="navigation-buttons">
+          <button id="prev-btn" class="btn btn-secondary">
+            ◀ [Alt+E] 이전
+          </button>
+          <button id="view-all-btn" class="btn btn-secondary">
+            [Alt+W] 전체 데이터
+          </button>
+          <button id="next-btn" class="btn btn-primary">
+            [Alt+N] 다음 ▶
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 전체 데이터 모달 -->
+    <div id="data-modal" class="modal hidden">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <h2>📋 상품 상세 정보</h2>
+          <button class="modal-close" data-modal="data-modal">✕</button>
+        </div>
+        <div class="modal-body" id="modal-data-body">
+          <!-- 동적으로 채워짐 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 이미지 미리보기 모달 -->
+    <div id="image-modal" class="modal hidden">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <h2>🖼️ 이미지 미리보기</h2>
+          <button class="modal-close" data-modal="image-modal">✕</button>
+        </div>
+        <div class="modal-body" id="modal-image-body">
+          <!-- 동적으로 채워짐 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 설정 모달 -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>⚙️ 설정</h2>
+          <button class="modal-close" data-modal="settings-modal">✕</button>
+        </div>
+        <div class="modal-body" id="modal-settings-body">
+          <!-- 동적으로 채워짐 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 도움말 모달 -->
+    <div id="help-modal" class="modal hidden">
+      <div class="modal-content modal-large">
+        <div class="modal-header">
+          <h2>❓ 도움말</h2>
+          <button class="modal-close" data-modal="help-modal">✕</button>
+        </div>
+        <div class="modal-body" id="modal-help-body">
+          <!-- 동적으로 채워짐 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 토스트 알림 -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../lib/papaparse.min.js"></script>
+  <script src="../utils/storage.js"></script>
+  <script src="../utils/csvHandler.js"></script>
+  <script src="../utils/idGenerator.js"></script>
+  <script src="../utils/imageScanner.js"></script>
+  <script src="../utils/shortcutHandler.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
